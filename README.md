@@ -1,0 +1,2 @@
+# sw_design12
+SoftwareDesign12月号執筆用のリポジトリ

@@ -22,8 +22,27 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PetsTable
+  PetstoreAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: swagger.yaml
+  LambdaPermissionCreatePet:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref CreatePet
+      Principal: apigateway.amazonaws.com
   CreatePetLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${CreatePet}
       RetentionInDays: 14
+Outputs:
+  ApiURL:
+    Description: API endpoint URL for Petstore API
+    Value: !Sub "https://${PetstoreAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

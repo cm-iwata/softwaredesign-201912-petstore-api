@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: PetstoreAPI Sample
+Parameters:
+  S3BucketForLayerPackage:
+    Type: String
+    Description: レイヤー用のパッケージを保存したS3バケット
+  S3KeyForLayerPackage:
+    Type: String
+    Description: レイヤー用パッケージのS3キー
 Globals:
   Function:
     Runtime: python3.7
@@ -20,7 +27,9 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       Description: 'Lambda Layer for Pet Store API'
-      ContentUri: layer
+      ContentUri:
+        Bucket: !Sub "${S3BucketForLayerPackage}"
+        Key: !Sub "${S3KeyForLayerPackage}"
   CreatePet:
     Type: AWS::Serverless::Function
     Properties:

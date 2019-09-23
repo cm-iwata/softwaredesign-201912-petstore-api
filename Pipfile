@@ -5,6 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 aws-sam-cli = "*"
+pytest = "*"
+moto = "*"
 
 [packages]
 

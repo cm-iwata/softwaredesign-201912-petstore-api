@@ -9,6 +9,7 @@ pytest = "*"
 moto = "*"
 
 [packages]
+cerberus = "*"
 
 [requires]
 python_version = "3.7"

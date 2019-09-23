@@ -7,6 +7,8 @@ Globals:
     Environment:
       Variables:
         PETS_TABLE: !Ref PetsTable
+    Layers:
+      - !Ref PetStoreAPILayer
 Resources:
   PetsTable:
     Type: AWS::Serverless::SimpleTable
@@ -14,6 +16,11 @@ Resources:
       PrimaryKey:
         Name: id
         Type: Number
+  PetStoreAPILayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: 'Lambda Layer for Pet Store API'
+      ContentUri: layer
   CreatePet:
     Type: AWS::Serverless::Function
     Properties:

@@ -3,6 +3,7 @@ from json.decoder import JSONDecodeError
 import os
 
 import boto3
+from botocore.exceptions import ClientError
 from cerberus import Validator
 
 dynamodb = boto3.resource('dynamodb')
@@ -61,7 +62,18 @@ def handler(event, context):
             })
         }
 
-    pets_table.put_item(Item=data)
+    try:
+        pets_table.put_item(Item=data,
+                            ConditionExpression='attribute_not_exists(id)')
+    except ClientError as e:
+        if e.response.get('Error', {}).get('Code') == 'ConditionalCheckFailedException':
+            return {
+                'statusCode': 409,
+                'body': json.dumps({
+                    'message': 'the specified id is already exists'
+                })
+            }
+        raise
 
     return {
       'statusCode': 201,

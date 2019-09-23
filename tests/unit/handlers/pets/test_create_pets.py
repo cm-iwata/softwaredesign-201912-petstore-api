@@ -95,3 +95,29 @@ def test_invalid_json_will_return_bad_request(data, res_body):
     res = handler(event, {})
     assert res['statusCode'] == 400
     assert res['body'] == res_body
+
+
+@pytest.mark.usefixtures('create_pets_table')
+def test_duplicate_id_return_conflict():
+
+    pets_table.put_item(Item={
+        'id': 1,
+        'name': 'cat'
+    })
+
+    event = {
+        'body': json.dumps({
+            'id': 1,
+            'name': 'dog',
+            'tags': [
+                {
+                    'id': 1,
+                    'name': 'some tag'
+                }
+            ]
+        })
+    }
+
+    res = handler(event, {})
+    assert res['statusCode'] == 409
+    assert len(pets_table.scan()['Items']) == 1

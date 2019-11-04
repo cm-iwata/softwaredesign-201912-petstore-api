@@ -33,8 +33,8 @@ Resources:
   CreatePet:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: create.handler
-      CodeUri: src/handlers/pets
+      Handler: handlers/pets/create.handler
+      CodeUri: src
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PetsTable

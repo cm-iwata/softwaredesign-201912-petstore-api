@@ -1,10 +1,11 @@
-import json
 import os
+from http import HTTPStatus
 
 import boto3
 import pytest
 
 from handlers.pets.create import handler
+from utils.json_util import JsonUtil
 
 dynamodb = boto3.resource('dynamodb')
 pets_table = dynamodb.Table(os.environ['PETS_TABLE'])
@@ -14,7 +15,7 @@ pets_table = dynamodb.Table(os.environ['PETS_TABLE'])
 def test_valid_data_will_creates_pet():
 
     event = {
-        'body': json.dumps({
+        'body': JsonUtil.dumps({
             'id': 1,
             'name': 'dog',
             'tags': [
@@ -27,8 +28,8 @@ def test_valid_data_will_creates_pet():
     }
 
     res = handler(event, {})
-    assert res['statusCode'] == 201
-    data = json.loads(res['body'])
+    assert res['statusCode'] == HTTPStatus.CREATED
+    data = JsonUtil.loads(res['body'])
     assert data['id'] == 1
     assert data['name'] == 'dog'
     assert data['tags'][0]['id'] == 1
@@ -89,11 +90,11 @@ def test_valid_data_will_creates_pet():
 def test_invalid_json_will_return_bad_request(data, res_body):
 
     event = {
-        'body': json.dumps(data)
+        'body': JsonUtil.dumps(data)
     }
 
     res = handler(event, {})
-    assert res['statusCode'] == 400
+    assert res['statusCode'] == HTTPStatus.BAD_REQUEST
     assert res['body'] == res_body
 
 
@@ -106,7 +107,7 @@ def test_duplicate_id_return_conflict():
     })
 
     event = {
-        'body': json.dumps({
+        'body': JsonUtil.dumps({
             'id': 1,
             'name': 'dog',
             'tags': [
@@ -119,5 +120,5 @@ def test_duplicate_id_return_conflict():
     }
 
     res = handler(event, {})
-    assert res['statusCode'] == 409
+    assert res['statusCode'] == HTTPStatus.CONFLICT
     assert len(pets_table.scan()['Items']) == 1

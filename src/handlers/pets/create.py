@@ -1,10 +1,10 @@
-import json
-from json.decoder import JSONDecodeError
 import os
 
 import boto3
 from botocore.exceptions import ClientError
 from cerberus import Validator
+
+from utils.json_util import JsonUtil
 
 dynamodb = boto3.resource('dynamodb')
 pets_table = dynamodb.Table(os.environ['PETS_TABLE'])
@@ -44,20 +44,20 @@ schema = {
 
 def handler(event, context):
 
-    if not __is_valid_json(event['body']):
+    if not JsonUtil.is_valid_json(event['body']):
         return {
             'statusCode': 400,
-            'body': json.dumps({
+            'body': JsonUtil.dumps({
                 'message': "request body doesn't contain valid json"
             })
         }
 
-    data = json.loads(event['body'])
+    data = JsonUtil.loads(event['body'])
     v = Validator(schema)
     if v.validate(data) is not True:
         return {
             'statusCode': 400,
-            'body': json.dumps({
+            'body': JsonUtil.dumps({
                 'message': v.errors
             })
         }
@@ -69,7 +69,7 @@ def handler(event, context):
         if e.response.get('Error', {}).get('Code') == 'ConditionalCheckFailedException':
             return {
                 'statusCode': 409,
-                'body': json.dumps({
+                'body': JsonUtil.dumps({
                     'message': 'the specified id is already exists'
                 })
             }
@@ -77,18 +77,5 @@ def handler(event, context):
 
     return {
       'statusCode': 201,
-      'body': json.dumps(data)
+      'body': JsonUtil.dumps(data)
     }
-
-
-def __is_valid_json(src):
-    if src is None:
-        return False
-
-    try:
-        res = json.loads(src)
-        if isinstance(res, dict) or isinstance(res, list):
-            return True
-        return False
-    except JSONDecodeError:
-        return False

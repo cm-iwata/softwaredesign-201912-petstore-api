@@ -1,9 +1,11 @@
 import os
+import logging
 
 import boto3
 from botocore.exceptions import ClientError
 from cerberus import Validator
 
+from decorators.handler_exception_decorator import handle_exception
 from utils.http_response_util import HttpResponseUtil
 from utils.json_util import JsonUtil
 
@@ -42,7 +44,10 @@ schema = {
     }
 }
 
+logger = logging.getLogger()
 
+
+@handle_exception(logger)
 def handler(event, context):
 
     if not JsonUtil.is_valid_json(event['body']):

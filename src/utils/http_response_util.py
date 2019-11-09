@@ -31,8 +31,22 @@ class HttpResponseUtil:
 
     @staticmethod
     def created(data, headers={}):
-        return _create_response(HTTPStatus.CREATED, JsonUtil.dumps(data), headers)
+        return _create_response(HTTPStatus.CREATED,
+                                JsonUtil.dumps(data),
+                                headers)
+
+    @staticmethod
+    def not_found(message, headers={}):
+        return _create_response(HTTPStatus.NOT_FOUND,
+                                JsonUtil.dumps({
+                                    'message': message
+                                }),
+                                headers)
 
     @staticmethod
     def ok(data, headers={}):
         return _create_response(HTTPStatus.OK, JsonUtil.dumps(data), headers)
+
+    @staticmethod
+    def pet_not_found():
+        return HttpResponseUtil.not_found('the specified pet was not found')

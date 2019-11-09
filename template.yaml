@@ -38,6 +38,14 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PetsTable
+  GetPet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/pets/get.handler
+      CodeUri: src
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PetsTable
   PetstoreAPI:
     Type: AWS::Serverless::Api
     Properties:
@@ -53,10 +61,21 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref CreatePet
       Principal: apigateway.amazonaws.com
+  LambdaPermissionGetPet:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GetPet
+      Principal: apigateway.amazonaws.com
   CreatePetLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${CreatePet}
+      RetentionInDays: 14
+  GetPetLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetPet}
       RetentionInDays: 14
 Outputs:
   ApiURL:

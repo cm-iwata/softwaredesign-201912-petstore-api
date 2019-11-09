@@ -38,6 +38,14 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PetsTable
+  DeletePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/pets/delete.handler
+      CodeUri: src
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
   GetPet:
     Type: AWS::Serverless::Function
     Properties:
@@ -61,6 +69,12 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref CreatePet
       Principal: apigateway.amazonaws.com
+  LambdaPermissionDeletePet:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DeletePet
+      Principal: apigateway.amazonaws.com
   LambdaPermissionGetPet:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -71,6 +85,11 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${CreatePet}
+      RetentionInDays: 14
+  DeletePetLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${DeletePet}
       RetentionInDays: 14
   GetPetLogGroup:
     Type: AWS::Logs::LogGroup

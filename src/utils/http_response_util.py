@@ -36,6 +36,12 @@ class HttpResponseUtil:
                                 headers)
 
     @staticmethod
+    def no_content(headers={}):
+        return _create_response(HTTPStatus.NO_CONTENT,
+                                '',
+                                headers)
+
+    @staticmethod
     def not_found(message, headers={}):
         return _create_response(HTTPStatus.NOT_FOUND,
                                 JsonUtil.dumps({

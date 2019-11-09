@@ -33,6 +33,35 @@ paths:
         contentHandling: CONVERT_TO_TEXT
         type: aws_proxy
   /pets/{petId}:
+    delete:
+      summary: Deletes a pet
+      operationId: deletePetById
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: Pet id to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePet.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        contentHandling: CONVERT_TO_TEXT
+        type: aws_proxy
     get:
       summary: Info for a specific pet
       operationId: showPetById

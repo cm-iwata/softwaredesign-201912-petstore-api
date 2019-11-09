@@ -26,6 +26,8 @@ schema = {
     'tags': {
         'type': 'list',
         'required': False,
+        'minlength': 1,
+        'maxlength': 10,
         'schema': {
             'type': 'dict',
             'schema': {

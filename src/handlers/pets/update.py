@@ -6,6 +6,7 @@ from botocore.exceptions import ClientError
 from cerberus import Validator
 
 from decorators.handler_exception_decorator import handle_exception
+from schemas.pet import pet_schema
 from utils.http_response_util import HttpResponseUtil
 from utils.json_util import JsonUtil
 from utils.validation_util import ValidationUtil
@@ -13,36 +14,6 @@ from utils.validation_util import ValidationUtil
 
 dynamodb = boto3.resource('dynamodb')
 pets_table = dynamodb.Table(os.environ['PETS_TABLE'])
-schema = {
-    'name': {
-        'type': 'string',
-        'minlength': 1,
-        'maxlength': 50,
-        'required': True,
-    },
-    'tags': {
-        'type': 'list',
-        'required': False,
-        'minlength': 1,
-        'maxlength': 10,
-        'schema': {
-            'type': 'dict',
-            'schema': {
-                'id': {
-                    'type': 'integer',
-                    'required': True,
-                },
-                'name': {
-                    'type': 'string',
-                    'minlength': 1,
-                    'maxlength': 50,
-                    'required': True,
-                }
-            }
-        }
-    }
-}
-
 logger = logging.getLogger()
 
 
@@ -57,7 +28,7 @@ def handler(event, context):
         return HttpResponseUtil.bad_request("request body doesn't contain valid json")
 
     data = JsonUtil.loads(event['body'])
-    v = Validator(schema)
+    v = Validator(pet_schema)
     if v.validate(data) is not True:
         return HttpResponseUtil.bad_request(v.errors)
 

@@ -54,6 +54,14 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref PetsTable
+  ListPets:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/pets/list.handler
+      CodeUri: src
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PetsTable
   UpdatePet:
     Type: AWS::Serverless::Function
     Properties:
@@ -89,6 +97,12 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref GetPet
       Principal: apigateway.amazonaws.com
+  LambdaPermissionListPets:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ListPets
+      Principal: apigateway.amazonaws.com
   LambdaPermissionUpdatePet:
     Type: "AWS::Lambda::Permission"
     Properties:
@@ -109,6 +123,11 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${GetPet}
+      RetentionInDays: 14
+  ListPetsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ListPets}
       RetentionInDays: 14
   UpdatePetLogGroup:
     Type: AWS::Logs::LogGroup
